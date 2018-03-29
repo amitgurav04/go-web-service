@@ -243,7 +243,7 @@ func channelExample() {
 }
 
 func main() {
-/*        Welcome()
+        Welcome()
 	PrintSqrt(25)
 	PrintRandomNumber(1000)
 
@@ -278,7 +278,7 @@ func main() {
 	mapExample()
 	goRoutineExample()
 	channelExample()
-*/
+
 	http.HandleFunc("/", index_handler)
         http.HandleFunc("/about", about_handler)
 	http.HandleFunc("/news",newsAggHandler)
