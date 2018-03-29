@@ -6,6 +6,10 @@ import (
 	"math"
 	"math/rand"
 	"io/ioutil"
+	"encoding/xml"
+	"html/template"
+	"time"
+	"sync"
 )
 
 func Welcome() {
@@ -87,6 +91,157 @@ func accessInternet() {
         fmt.Println(string_body)
 }
 
+type SitemapIndex struct {
+	Sitemaps []Sitemap `xml:"sitemap"`
+}
+
+type Sitemap struct {
+	Loc string `xml:"loc"`
+}
+
+func (s Sitemap) String() string  {
+	return fmt.Sprintf(s.Loc)
+}
+
+func (s SitemapIndex) RangeExample() {
+        fmt.Println("Example of Range:")
+        for _, sitemap := range s.Sitemaps {
+                fmt.Printf("\n%s",sitemap)
+        }
+}
+
+func parseXML() {
+        resp, _ := http.Get("https://www.washingtonpost.com/news-sitemap-index.xml")
+        bytes, _ := ioutil.ReadAll(resp.Body)
+
+	var s SitemapIndex
+	xml.Unmarshal(bytes, &s)
+	s.RangeExample()
+	fmt.Println(s.Sitemaps)
+}
+
+func forLoopExample(n int) {
+	fmt.Println("Example of For Loop:")
+	for i:=0; i<n; i++ {
+		fmt.Println(i)
+	}
+}
+
+func whileLoopExample(n int) {
+        fmt.Println("Example of while Loop using for loop:")
+
+	i := 0
+        for i<n {
+                fmt.Println(i)
+		i++
+		i+=2
+        }
+}
+
+func breakInfiniteLoopExample(n int) {
+        fmt.Println("Example of break Infinite Loop using for loop:")
+
+        i := 0
+        for {
+                fmt.Println(i)
+		i+=3
+
+		if i>n {
+			break
+		}
+        }
+}
+
+func mapExample() {
+	grades := make(map[string]float64)
+	grades["Amit"] = 45.3
+	grades["Manoj"] = 55.2
+	grades["Amol"] = 63.3
+
+	fmt.Println("Grades from Map are:",grades)
+
+	AmsGrade := grades["Amit"]
+	fmt.Println("Grade of Amit is:",AmsGrade)
+
+        delete(grades,"Amit")
+        fmt.Println("Grades after deleteing Amit:", grades)
+
+	for k, v := range grades {
+		fmt.Println(k,":",v)
+	}
+}
+
+type NewsAggPage struct {
+	Title string
+	News string
+}
+
+func cleanup() {
+	if r := recover(); r != nil {
+		fmt.Println("Recovered in cleanup", r)
+	}
+	defer wg.Done()
+}
+
+func say(s string) {
+	defer cleanup()
+	defer fmt.Println("I am Done")
+	for i := 0; i < 3; i++ {
+		fmt.Println(s)
+		time.Sleep(time.Millisecond*100)
+		if i == 2 {
+			panic("Ohh I am panic, it's 2")
+		}
+	}
+}
+
+func newsAggHandler(w http.ResponseWriter, r *http.Request) {
+	p := NewsAggPage{Title: "Amit Gurav", News: "Won the match"}
+	t, err := template.ParseFiles("application.html")
+	fmt.Println(err)
+	t.Execute(w, p)
+}
+var wg sync.WaitGroup
+
+func goRoutineExample() {
+        wg.Add(1)
+        go say("Hey")
+        wg.Add(1)
+        go say("There")
+        wg.Wait()
+}
+
+func putOnChannel(c chan int, somevalue int) {
+	defer wg.Done()
+	c <- somevalue * 5
+}
+
+func channelExample() {
+	fmt.Println("This is example of channel:")
+	mychannel := make(chan int, 12)
+
+	wg.Add(1)
+	go putOnChannel(mychannel, 3)
+	wg.Add(1)
+	go putOnChannel(mychannel, 5)
+
+	v1 := <-mychannel
+	v2 := <-mychannel
+
+	fmt.Println("v1 from channel:", v1)
+	fmt.Println("v2 from channel:", v2)
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go putOnChannel(mychannel, i)
+	}
+	wg.Wait()
+	close(mychannel)
+	for item := range mychannel {
+		fmt.Println("Val from channel is:",item)
+	}
+}
+
 func main() {
         Welcome()
 	PrintSqrt(25)
@@ -116,8 +271,16 @@ func main() {
 	fmt.Println("Top speed:", car_a.top_speed_km)
 
 	accessInternet()
- 
+	parseXML()
+	forLoopExample(10)
+	whileLoopExample(20)
+	breakInfiniteLoopExample(30)
+	mapExample()
+	goRoutineExample()
+	channelExample()
+
 	http.HandleFunc("/", index_handler)
         http.HandleFunc("/about", about_handler)
+	http.HandleFunc("/news",newsAggHandler)
 	http.ListenAndServe(":8080", nil)
 }
