@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "Xzof0iOZ6fycui1RUqe+O0vIrVU=",
+			"path": "go-web-service/src/github.com/codetaming/go-web-service/stringutil",
+			"revision": "b8c53a445ab6a4dfc224e5deb46b3ee09e9feb43",
+			"revisionTime": "2018-03-30T12:07:44Z"
+		}
+	],
+	"rootPath": "go-web-service"
+}
