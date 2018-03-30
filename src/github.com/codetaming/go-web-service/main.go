@@ -10,7 +10,7 @@ import (
 	"html/template"
 	"time"
 	"sync"
-	"go-web-service/src/github.com/codetaming/go-web-service/stringutil"
+	"stringutil"
 )
 
 func Welcome() {
