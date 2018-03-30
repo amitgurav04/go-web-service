@@ -10,6 +10,7 @@ import (
 	"html/template"
 	"time"
 	"sync"
+	"go-web-service/src/github.com/codetaming/go-web-service/stringutil"
 )
 
 func Welcome() {
@@ -278,6 +279,7 @@ func main() {
 	mapExample()
 	goRoutineExample()
 	channelExample()
+	fmt.Printf(stringutil.Reverse("!oG ,olleH"))
 
 	http.HandleFunc("/", index_handler)
         http.HandleFunc("/about", about_handler)
